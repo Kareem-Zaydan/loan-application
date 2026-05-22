@@ -11,10 +11,12 @@ export const steps = [
         description: 'Collect applicant name, DOB, contact, and family details.',
         formId: 'step-2-personal-info-form',
     },
+
     {
         id: 3,
         title: 'KYC Verification',
         description: 'PAN, Aadhaar, consent, and identity verification simulation.',
+        formId: 'step-3-kyc-verification-form',
     },
     {
         id: 4,
