@@ -9,6 +9,7 @@ export const steps = [
         id: 2,
         title: 'Personal Information',
         description: 'Collect applicant name, DOB, contact, and family details.',
+        formId: 'step-2-personal-info-form',
     },
     {
         id: 3,

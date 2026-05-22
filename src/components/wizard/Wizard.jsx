@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { steps } from '../../data/steps';
 import Step1LoanType from '../steps/Step1LoanType';
+import Step2PersonalInfo from '../steps/Step2PersonalInfo';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
 
 function Wizard() {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
     const [applicationData, setApplicationData] = useState({
         step1: {},
+        step2: {},
     });
 
     const currentStep = steps[currentStepIndex];
@@ -46,6 +49,15 @@ function Wizard() {
         goToNextStep();
     };
 
+    const saveStep2AndContinue = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step2: stepData,
+        }));
+
+        goToNextStep();
+    };
+
     const renderStepContent = () => {
         if (currentStep.id === 1) {
             return (
@@ -53,6 +65,16 @@ function Wizard() {
                     formId={currentStep.formId}
                     defaultValues={applicationData.step1}
                     onSubmit={saveStep1AndContinue}
+                />
+            );
+        }
+
+        if (currentStep.id === 2) {
+            return (
+                <Step2PersonalInfo
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step2}
+                    onSubmit={saveStep2AndContinue}
                 />
             );
         }
@@ -84,8 +106,8 @@ function Wizard() {
                     </h1>
 
                     <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-                        Complete your loan application step by step. Your progress will later be saved
-                        automatically so you can resume the application.
+                        Complete your loan application step by step. Your progress will
+                        later be saved automatically so you can resume the application.
                     </p>
                 </div>
 
