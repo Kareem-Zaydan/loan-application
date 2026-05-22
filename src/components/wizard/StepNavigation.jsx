@@ -3,9 +3,20 @@ function StepNavigation({
     totalSteps,
     onPrevious,
     onNext,
+    nextFormId,
 }) {
     const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === totalSteps - 1;
+
+    const nextButtonProps = nextFormId
+        ? {
+            type: 'submit',
+            form: nextFormId,
+        }
+        : {
+            type: 'button',
+            onClick: onNext,
+        };
 
     return (
         <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
@@ -26,8 +37,7 @@ function StepNavigation({
             </button>
 
             <button
-                type="button"
-                onClick={onNext}
+                {...nextButtonProps}
                 disabled={isLastStep}
                 className="min-h-11 rounded-xl bg-primary px-5 py-2 font-semibold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-50"
             >

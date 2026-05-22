@@ -3,6 +3,7 @@ export const steps = [
         id: 1,
         title: 'Loan Type',
         description: 'Choose loan type, amount, tenure, and purpose.',
+        formId: 'step-1-loan-type-form',
     },
     {
         id: 2,

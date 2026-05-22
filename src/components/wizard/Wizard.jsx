@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { steps } from '../../data/steps';
+import Step1LoanType from '../steps/Step1LoanType';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
 
 function Wizard() {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [applicationData, setApplicationData] = useState({
+        step1: {},
+    });
 
     const currentStep = steps[currentStepIndex];
 
@@ -31,6 +35,40 @@ function Wizard() {
 
     const goToStep = (stepIndex) => {
         setCurrentStepIndex(stepIndex);
+    };
+
+    const saveStep1AndContinue = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step1: stepData,
+        }));
+
+        goToNextStep();
+    };
+
+    const renderStepContent = () => {
+        if (currentStep.id === 1) {
+            return (
+                <Step1LoanType
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step1}
+                    onSubmit={saveStep1AndContinue}
+                />
+            );
+        }
+
+        return (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <p className="text-lg font-semibold text-slate-800">
+                    {currentStep.title} fields will be built here.
+                </p>
+
+                <p className="mt-2 text-sm text-slate-500">
+                    This step is still a placeholder. We will replace it with real fields
+                    in the next phases.
+                </p>
+            </div>
+        );
     };
 
     return (
@@ -80,22 +118,14 @@ function Wizard() {
                             </p>
                         </div>
 
-                        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-                            <p className="text-lg font-semibold text-slate-800">
-                                {currentStep.title} fields will be built here.
-                            </p>
-
-                            <p className="mt-2 text-sm text-slate-500">
-                                This is only the Phase 1 wizard skeleton. Real form inputs and validation
-                                will be added in the next phases.
-                            </p>
-                        </div>
+                        {renderStepContent()}
 
                         <StepNavigation
                             currentStepIndex={currentStepIndex}
                             totalSteps={steps.length}
                             onPrevious={goToPreviousStep}
                             onNext={goToNextStep}
+                            nextFormId={currentStep.formId}
                         />
                     </section>
                 </div>
