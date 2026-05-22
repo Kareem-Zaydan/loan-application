@@ -15,6 +15,7 @@ export const steps = [
         id: 3,
         title: 'KYC Verification',
         description: 'PAN, Aadhaar, consent, and identity verification simulation.',
+        formId: 'step-3-kyc-verification-form',
     },
     {
         id: 4,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { steps } from '../../data/steps';
 import Step1LoanType from '../steps/Step1LoanType';
 import Step2PersonalInfo from '../steps/Step2PersonalInfo';
+import Step3KYC from '../steps/Step3KYC';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
@@ -12,6 +13,7 @@ function Wizard() {
     const [applicationData, setApplicationData] = useState({
         step1: {},
         step2: {},
+        step3: {},
     });
 
     const currentStep = steps[currentStepIndex];
@@ -58,6 +60,15 @@ function Wizard() {
         goToNextStep();
     };
 
+    const saveStep3AndContinue = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step3: stepData,
+        }));
+
+        goToNextStep();
+    };
+
     const renderStepContent = () => {
         if (currentStep.id === 1) {
             return (
@@ -75,6 +86,18 @@ function Wizard() {
                     formId={currentStep.formId}
                     defaultValues={applicationData.step2}
                     onSubmit={saveStep2AndContinue}
+                />
+            );
+        }
+
+        if (currentStep.id === 3) {
+            return (
+                <Step3KYC
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step3}
+                    loanType={applicationData.step1.loanType}
+                    loanAmount={applicationData.step1.loanAmount}
+                    onSubmit={saveStep3AndContinue}
                 />
             );
         }
