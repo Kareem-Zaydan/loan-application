@@ -28,6 +28,7 @@ export const steps = [
         id: 5,
         title: 'Employment & Income',
         description: 'Salaried, self-employed, or business owner income details.',
+        formId: 'step-5-employment-income-form',
     },
     {
         id: 6,
