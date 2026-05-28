@@ -32,8 +32,9 @@ export const steps = [
     },
     {
         id: 6,
-        title: 'Co-Applicant',
-        description: 'Conditional co-applicant and guarantor information.',
+        title: 'Co-applicant Details',
+        description: 'Optional co-applicant information, KYC, income, and consent.',
+        formId: 'step-6-co-applicant-form',
     },
     {
         id: 7,
