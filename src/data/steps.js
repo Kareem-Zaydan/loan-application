@@ -22,6 +22,7 @@ export const steps = [
         id: 4,
         title: 'Address Information',
         description: 'Current address, PIN lookup, residence type, and permanent address.',
+        formId: 'step-4-address-info-form',
     },
     {
         id: 5,

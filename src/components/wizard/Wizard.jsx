@@ -3,6 +3,7 @@ import { steps } from '../../data/steps';
 import Step1LoanType from '../steps/Step1LoanType';
 import Step2PersonalInfo from '../steps/Step2PersonalInfo';
 import Step3KYC from '../steps/Step3KYC';
+import Step4Address from '../steps/Step4Address';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
@@ -14,6 +15,7 @@ function Wizard() {
         step1: {},
         step2: {},
         step3: {},
+        step4: {},
     });
 
     const currentStep = steps[currentStepIndex];
@@ -69,6 +71,15 @@ function Wizard() {
         goToNextStep();
     };
 
+    const saveStep4AndContinue = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step4: stepData,
+        }));
+
+        goToNextStep();
+    };
+
     const renderStepContent = () => {
         if (currentStep.id === 1) {
             return (
@@ -98,6 +109,16 @@ function Wizard() {
                     loanType={applicationData.step1.loanType}
                     loanAmount={applicationData.step1.loanAmount}
                     onSubmit={saveStep3AndContinue}
+                />
+            );
+        }
+
+        if (currentStep.id === 4) {
+            return (
+                <Step4Address
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step4}
+                    onSubmit={saveStep4AndContinue}
                 />
             );
         }
