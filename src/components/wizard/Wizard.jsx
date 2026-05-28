@@ -6,6 +6,7 @@ import Step3KYC from '../steps/Step3KYC';
 import Step4Address from '../steps/Step4Address';
 import Step5Employment from '../steps/Step5Employment';
 import Step6CoApplicant from '../steps/Step6CoApplicant';
+import Step7DocumentsSignature from '../steps/Step7DocumentsSignature';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
@@ -20,6 +21,7 @@ function Wizard() {
         step4: {},
         step5: {},
         step6: {},
+        step7: {},
     });
 
     const currentStep = steps[currentStepIndex];
@@ -102,6 +104,15 @@ function Wizard() {
         goToNextStep();
     };
 
+    const saveStep7AndContinue = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step7: stepData,
+        }));
+
+        goToNextStep();
+    };
+
     const renderStepContent = () => {
         if (currentStep.id === 1) {
             return (
@@ -162,6 +173,16 @@ function Wizard() {
                     formId={currentStep.formId}
                     defaultValues={applicationData.step6}
                     onSubmit={saveStep6AndContinue}
+                />
+            );
+        }
+
+        if (currentStep.id === 7) {
+            return (
+                <Step7DocumentsSignature
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step7}
+                    onSubmit={saveStep7AndContinue}
                 />
             );
         }

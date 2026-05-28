@@ -38,8 +38,9 @@ export const steps = [
     },
     {
         id: 7,
-        title: 'Documents & E-Signature',
-        description: 'Upload required documents and capture digital signature.',
+        title: 'Documents & E-signature',
+        description: 'Upload required documents, preview files, compress images, and sign digitally.',
+        formId: 'step-7-documents-signature-form',
     },
     {
         id: 8,
