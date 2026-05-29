@@ -7,12 +7,14 @@ import Step4Address from '../steps/Step4Address';
 import Step5Employment from '../steps/Step5Employment';
 import Step6CoApplicant from '../steps/Step6CoApplicant';
 import Step7DocumentsSignature from '../steps/Step7DocumentsSignature';
+import Step8ReviewSubmit from '../steps/Step8ReviewSubmit';
 import ProgressBar from './ProgressBar';
 import StepNavigation from './StepNavigation';
 import StepSidebar from './StepSidebar';
 
 function Wizard() {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const [applicationData, setApplicationData] = useState({
         step1: {},
@@ -22,6 +24,7 @@ function Wizard() {
         step5: {},
         step6: {},
         step7: {},
+        step8: {},
     });
 
     const currentStep = steps[currentStepIndex];
@@ -113,6 +116,15 @@ function Wizard() {
         goToNextStep();
     };
 
+    const saveStep8AndSubmit = (stepData) => {
+        setApplicationData((previousData) => ({
+            ...previousData,
+            step8: stepData,
+        }));
+
+        setIsSubmitted(true);
+    };
+
     const renderStepContent = () => {
         if (currentStep.id === 1) {
             return (
@@ -187,19 +199,45 @@ function Wizard() {
             );
         }
 
-        return (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-                <p className="text-lg font-semibold text-slate-800">
-                    {currentStep.title} fields will be built here.
-                </p>
+        if (currentStep.id === 8) {
+            return (
+                <Step8ReviewSubmit
+                    formId={currentStep.formId}
+                    defaultValues={applicationData.step8}
+                    applicationData={applicationData}
+                    onSubmit={saveStep8AndSubmit}
+                />
+            );
+        }
 
-                <p className="mt-2 text-sm text-slate-500">
-                    This step is still a placeholder. We will replace it with real fields
-                    in the next phases.
-                </p>
-            </div>
-        );
+        return null;
     };
+
+    if (isSubmitted) {
+        return (
+            <main className="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
+                <section className="mx-auto max-w-3xl rounded-2xl bg-white p-8 text-center shadow-sm">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-3xl">
+                        ✓
+                    </div>
+
+                    <h1 className="mt-6 text-3xl font-bold text-slate-900">
+                        Application Submitted Successfully
+                    </h1>
+
+                    <p className="mt-3 text-slate-600">
+                        Your multi-step loan application has been submitted for processing.
+                        A confirmation summary has been generated in the application state.
+                    </p>
+
+                    <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm font-semibold text-slate-700">
+                        Demo Application ID: LS-
+                        {Date.now().toString().slice(-8)}
+                    </p>
+                </section>
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">

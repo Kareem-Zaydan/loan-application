@@ -45,6 +45,7 @@ export const steps = [
     {
         id: 8,
         title: 'Review & Submit',
-        description: 'Review application, calculate EMI, give consent, and submit.',
+        description: 'Review the full application, check pre-approval, and submit.',
+        formId: 'step-8-review-submit-form',
     },
 ];

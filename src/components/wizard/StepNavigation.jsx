@@ -8,41 +8,46 @@ function StepNavigation({
     const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === totalSteps - 1;
 
-    const nextButtonProps = nextFormId
-        ? {
-            type: 'submit',
-            form: nextFormId,
-        }
-        : {
-            type: 'button',
-            onClick: onNext,
-        };
+    const nextButtonLabel = isLastStep ? 'Submit Application' : 'Next';
+
+    const shouldSubmitForm = Boolean(nextFormId);
 
     return (
-        <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <button
                 type="button"
                 onClick={onPrevious}
                 disabled={isFirstStep}
-                className="min-h-11 rounded-xl border border-slate-300 px-5 py-2 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 Previous
             </button>
 
             <button
                 type="button"
-                className="min-h-11 rounded-xl border border-primary px-5 py-2 font-semibold text-primary transition hover:bg-primary hover:text-white"
+                className="rounded-xl border border-primary px-5 py-3 font-semibold text-primary transition hover:bg-primary hover:text-white"
             >
                 Save Draft
             </button>
 
-            <button
-                {...nextButtonProps}
-                disabled={isLastStep}
-                className="min-h-11 rounded-xl bg-primary px-5 py-2 font-semibold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-                Next
-            </button>
+            {shouldSubmitForm ? (
+                <button
+                    type="submit"
+                    form={nextFormId}
+                    className="rounded-xl bg-primary px-5 py-3 font-semibold text-white transition hover:bg-primary/90"
+                >
+                    {nextButtonLabel}
+                </button>
+            ) : (
+                <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={isLastStep}
+                    className="rounded-xl bg-primary px-5 py-3 font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-slate-400"
+                >
+                    {nextButtonLabel}
+                </button>
+            )}
         </div>
     );
 }
