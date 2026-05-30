@@ -2,20 +2,6 @@ import { z } from 'zod';
 
 const optionalText = z.string().trim().optional();
 
-const requiredNumber = (fieldName, schema) => z.preprocess(
-    (value) => {
-        if (value === '' || value === null || value === undefined) {
-            return undefined;
-        }
-
-        return Number(value);
-    },
-    schema || z.number({
-        required_error: `${fieldName} is required.`,
-        invalid_type_error: `${fieldName} must be a valid number.`,
-    }),
-);
-
 const optionalNumber = z.preprocess(
     (value) => {
         if (value === '' || value === null || value === undefined) {
@@ -44,17 +30,7 @@ export function createStep5Schema({ loanType = 'personal' } = {}) {
             companyName: optionalText,
             designation: optionalText,
             monthlyNetSalary: optionalNumber,
-
-            yearsOfExperience: requiredNumber(
-                'Years of experience',
-                z
-                    .number({
-                        required_error: 'Years of experience is required.',
-                        invalid_type_error: 'Years of experience must be a valid number.',
-                    })
-                    .min(0, 'Years of experience cannot be negative.')
-                    .max(50, 'Years of experience cannot exceed 50.'),
-            ),
+            yearsOfExperience: optionalNumber,
 
             businessName: optionalText,
             businessType: optionalText,
@@ -102,6 +78,18 @@ export function createStep5Schema({ loanType = 'personal' } = {}) {
                         code: z.ZodIssueCode.custom,
                         path: ['monthlyNetSalary'],
                         message: 'Monthly net salary must be at least ₹15,000.',
+                    });
+                }
+
+                if (
+                    data.yearsOfExperience === undefined
+                    || data.yearsOfExperience < 0
+                    || data.yearsOfExperience > 50
+                ) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['yearsOfExperience'],
+                        message: 'Years of experience must be between 0 and 50.',
                     });
                 }
             }
