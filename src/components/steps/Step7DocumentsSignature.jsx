@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SignatureCanvas from 'react-signature-canvas';
 import { useForm } from 'react-hook-form';
@@ -30,6 +30,44 @@ const defaultStep7Values = {
     documentConsent: false,
 };
 
+function prepareRestoredValues(defaultValues) {
+    const preparedValues = {
+        ...defaultStep7Values,
+        ...defaultValues,
+    };
+
+    const documentFields = [
+        'identityProof',
+        'addressProof',
+        'incomeProof',
+        'bankStatement',
+    ];
+
+    documentFields.forEach((fieldName) => {
+        const documents = preparedValues[fieldName];
+
+        if (
+            Array.isArray(documents)
+            && documents.some(
+                (documentRecord) =>
+                    documentRecord.restoredFromDraft
+                    || !documentRecord.previewUrl,
+            )
+        ) {
+            preparedValues[fieldName] = [];
+        }
+    });
+
+    if (
+        preparedValues.signatureNeedsRedraw
+        || !preparedValues.signatureDataUrl
+    ) {
+        preparedValues.signatureDataUrl = '';
+    }
+
+    return preparedValues;
+}
+
 function DocumentUploadCard({
     requirement,
     documents,
@@ -47,11 +85,15 @@ function DocumentUploadCard({
             const rejection = rejectedFiles[0];
 
             if (rejection.file.size > MAX_DOCUMENT_SIZE_BYTES) {
-                setUploadError('File is too large. Maximum allowed size is 5 MB.');
+                setUploadError(
+                    'File is too large. Maximum allowed size is 5 MB.',
+                );
                 return;
             }
 
-            setUploadError('Unsupported file type. Please upload PDF, JPG, or PNG.');
+            setUploadError(
+                'Unsupported file type. Please upload PDF, JPG, or PNG.',
+            );
             return;
         }
 
@@ -63,12 +105,19 @@ function DocumentUploadCard({
 
         try {
             setIsCompressing(true);
+
             const compressedFile = await compressImageFile(file);
-            const documentRecord = createDocumentRecord(file, compressedFile);
+
+            const documentRecord = createDocumentRecord(
+                file,
+                compressedFile,
+            );
 
             onUpload(requirement.key, documentRecord);
         } catch {
-            setUploadError('Could not process this file. Please try another file.');
+            setUploadError(
+                'Could not process this file. Please try another file.',
+            );
         } finally {
             setIsCompressing(false);
         }
@@ -92,6 +141,7 @@ function DocumentUploadCard({
             <div className="mb-4">
                 <h4 className="font-bold text-slate-900">
                     {requirement.title}
+
                     {requirement.required && (
                         <span className="ml-1 text-error">*</span>
                     )}
@@ -105,15 +155,18 @@ function DocumentUploadCard({
             {!uploadedDocument && (
                 <div
                     {...getRootProps()}
-                    className={`cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition ${isDragActive
+                    className={`cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition ${
+                        isDragActive
                             ? 'border-accent bg-accent/10'
                             : 'border-slate-300 bg-slate-50 hover:border-accent'
-                        }`}
+                    }`}
                 >
                     <input {...getInputProps()} />
 
                     <p className="font-semibold text-slate-800">
-                        {isDragActive ? 'Drop the file here' : 'Drag & drop document here'}
+                        {isDragActive
+                            ? 'Drop the file here'
+                            : 'Drag & drop document here'}
                     </p>
 
                     <p className="mt-1 text-sm text-slate-500">
@@ -142,42 +195,57 @@ function DocumentUploadCard({
 
                             {uploadedDocument.compressionSavedBytes > 0 && (
                                 <p className="mt-1 text-sm font-semibold text-accent">
-                                    Compressed and saved {formatFileSize(uploadedDocument.compressionSavedBytes)}
+                                    Compressed and saved{' '}
+                                    {formatFileSize(
+                                        uploadedDocument.compressionSavedBytes,
+                                    )}
                                 </p>
                             )}
 
                             <p className="mt-1 text-xs text-slate-400">
-                                Uploaded at {new Date(uploadedDocument.uploadedAt).toLocaleString()}
+                                Uploaded at{' '}
+                                {new Date(
+                                    uploadedDocument.uploadedAt,
+                                ).toLocaleString()}
                             </p>
                         </div>
 
                         <button
                             type="button"
-                            onClick={() => onRemove(requirement.key, uploadedDocument)}
+                            onClick={() =>
+                                onRemove(
+                                    requirement.key,
+                                    uploadedDocument,
+                                )
+                            }
                             className="rounded-lg border border-error px-4 py-2 text-sm font-semibold text-error hover:bg-error hover:text-white"
                         >
                             Remove
                         </button>
                     </div>
 
-                    {uploadedDocument.type.startsWith('image/') && (
-                        <img
-                            src={uploadedDocument.previewUrl}
-                            alt={`${requirement.title} preview`}
-                            className="mt-4 max-h-56 rounded-xl border border-slate-200 object-contain"
-                        />
-                    )}
+                    {uploadedDocument.previewUrl
+                        && uploadedDocument.type.startsWith('image/')
+                        && (
+                            <img
+                                src={uploadedDocument.previewUrl}
+                                alt={`${requirement.title} preview`}
+                                className="mt-4 max-h-56 rounded-xl border border-slate-200 object-contain"
+                            />
+                        )}
 
-                    {uploadedDocument.type === 'application/pdf' && (
-                        <a
-                            href={uploadedDocument.previewUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-4 inline-block text-sm font-semibold text-accent underline"
-                        >
-                            Open PDF preview
-                        </a>
-                    )}
+                    {uploadedDocument.previewUrl
+                        && uploadedDocument.type === 'application/pdf'
+                        && (
+                            <a
+                                href={uploadedDocument.previewUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-4 inline-block text-sm font-semibold text-accent underline"
+                            >
+                                Open PDF preview
+                            </a>
+                        )}
                 </div>
             )}
 
@@ -204,10 +272,9 @@ function Step7DocumentsSignature({
         formState: { errors },
     } = useForm({
         resolver: zodResolver(step7Schema),
-        defaultValues: {
-            ...defaultStep7Values,
-            ...defaultValues,
-        },
+
+        defaultValues: prepareRestoredValues(defaultValues),
+
         mode: 'onBlur',
         reValidateMode: 'onChange',
     });
@@ -221,17 +288,10 @@ function Step7DocumentsSignature({
 
     const signatureDataUrl = watch('signatureDataUrl');
 
-    useEffect(() => {
-        return () => {
-            Object.values(watchedDocuments).forEach((documents) => {
-                documents.forEach((documentRecord) => {
-                    revokePreviewUrl(documentRecord);
-                });
-            });
-        };
-    }, []);
-
-    const handleDocumentUpload = (fieldName, documentRecord) => {
+    const handleDocumentUpload = (
+        fieldName,
+        documentRecord,
+    ) => {
         const existingDocuments = watch(fieldName) || [];
 
         existingDocuments.forEach((existingDocument) => {
@@ -244,7 +304,10 @@ function Step7DocumentsSignature({
         });
     };
 
-    const handleDocumentRemove = (fieldName, documentRecord) => {
+    const handleDocumentRemove = (
+        fieldName,
+        documentRecord,
+    ) => {
         revokePreviewUrl(documentRecord);
 
         setValue(fieldName, [], {
@@ -254,7 +317,10 @@ function Step7DocumentsSignature({
     };
 
     const handleSignatureEnd = () => {
-        if (!signatureRef.current || signatureRef.current.isEmpty()) {
+        if (
+            !signatureRef.current
+            || signatureRef.current.isEmpty()
+        ) {
             setValue('signatureDataUrl', '', {
                 shouldValidate: true,
                 shouldDirty: true,
@@ -263,10 +329,14 @@ function Step7DocumentsSignature({
             return;
         }
 
-        setValue('signatureDataUrl', signatureRef.current.toDataURL('image/png'), {
-            shouldValidate: true,
-            shouldDirty: true,
-        });
+        setValue(
+            'signatureDataUrl',
+            signatureRef.current.toDataURL('image/png'),
+            {
+                shouldValidate: true,
+                shouldDirty: true,
+            },
+        );
     };
 
     const clearSignature = () => {
@@ -295,17 +365,27 @@ function Step7DocumentsSignature({
                 </h3>
 
                 <p className="mt-1 text-sm text-slate-600">
-                    Upload required documents and draw your e-signature before continuing
-                    to the final review step.
+                    Upload required documents and draw your e-signature
+                    before continuing to the final review step.
                 </p>
             </div>
+
+            {defaultValues.signatureNeedsRedraw && (
+                <div className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+                    This application was restored from a saved draft.
+                    For security and browser compatibility, please
+                    re-upload your documents and draw your signature again.
+                </div>
+            )}
 
             <div className="grid gap-5">
                 {DOCUMENT_REQUIREMENTS.map((requirement) => (
                     <DocumentUploadCard
                         key={requirement.key}
                         requirement={requirement}
-                        documents={watchedDocuments[requirement.key] || []}
+                        documents={
+                            watchedDocuments[requirement.key] || []
+                        }
                         error={errors[requirement.key]?.message}
                         onUpload={handleDocumentUpload}
                         onRemove={handleDocumentRemove}
@@ -330,8 +410,10 @@ function Step7DocumentsSignature({
                         ref={signatureRef}
                         penColor="black"
                         canvasProps={{
-                            className: 'h-44 w-full rounded-xl',
-                            'aria-label': 'Signature canvas',
+                            className:
+                                'h-44 w-full rounded-xl',
+                            'aria-label':
+                                'Signature canvas',
                         }}
                         onEnd={handleSignatureEnd}
                     />

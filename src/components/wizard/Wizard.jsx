@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { steps } from '../../data/steps';
 import useEncryptedAutoSave from '../../hooks/useEncryptedAutoSave';
 import Step1LoanType from '../steps/Step1LoanType';
@@ -35,13 +35,18 @@ function hasApplicationStarted(applicationData) {
 function Wizard() {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [hasResolvedDraftChoice, setHasResolvedDraftChoice] = useState(false);
+    const [applicationId, setApplicationId] = useState('');
+    const [hasResolvedDraftChoice, setHasResolvedDraftChoice] =
+        useState(false);
     const [isLoadingDraft, setIsLoadingDraft] = useState(false);
     const [draftRestoreKey, setDraftRestoreKey] = useState(0);
 
-    const [applicationData, setApplicationData] = useState(initialApplicationData);
+    const [applicationData, setApplicationData] = useState(
+        initialApplicationData,
+    );
 
-    const applicationStarted = hasApplicationStarted(applicationData);
+    const applicationStarted =
+        hasApplicationStarted(applicationData);
 
     const {
         hasDraft,
@@ -55,17 +60,18 @@ function Wizard() {
         applicationData,
         currentStepIndex,
         {
-            enabled: hasResolvedDraftChoice && !isSubmitted && applicationStarted,
+            enabled:
+                hasResolvedDraftChoice
+                && !isSubmitted
+                && applicationStarted,
         },
     );
 
-    const currentStep = steps[currentStepIndex];
+    const draftChoiceResolved =
+        hasResolvedDraftChoice
+        || (hasCheckedForDraft && !hasDraft);
 
-    useEffect(() => {
-        if (hasCheckedForDraft && !hasDraft) {
-            setHasResolvedDraftChoice(true);
-        }
-    }, [hasCheckedForDraft, hasDraft]);
+    const currentStep = steps[currentStepIndex];
 
     const handleResumeDraft = async () => {
         try {
@@ -85,7 +91,9 @@ function Wizard() {
                         : 0,
                 );
 
-                setDraftRestoreKey((previousKey) => previousKey + 1);
+                setDraftRestoreKey(
+                    (previousKey) => previousKey + 1,
+                );
             }
 
             setHasResolvedDraftChoice(true);
@@ -96,15 +104,26 @@ function Wizard() {
 
     const handleStartFresh = () => {
         clearDraft();
-        setApplicationData({ ...initialApplicationData });
+
+        setApplicationData({
+            ...initialApplicationData,
+        });
+
         setCurrentStepIndex(0);
-        setDraftRestoreKey((previousKey) => previousKey + 1);
+
+        setDraftRestoreKey(
+            (previousKey) => previousKey + 1,
+        );
+
         setHasResolvedDraftChoice(true);
     };
 
     const goToNextStep = () => {
         setCurrentStepIndex((previousStepIndex) => {
-            if (previousStepIndex === steps.length - 1) {
+            if (
+                previousStepIndex
+                === steps.length - 1
+            ) {
                 return previousStepIndex;
             }
 
@@ -195,7 +214,13 @@ function Wizard() {
             step8: stepData,
         }));
 
+        const generatedApplicationId =
+            `LS-${Date.now().toString().slice(-8)}`;
+
+        setApplicationId(generatedApplicationId);
+
         clearDraft();
+
         setIsSubmitted(true);
     };
 
@@ -308,13 +333,14 @@ function Wizard() {
                     </h1>
 
                     <p className="mt-3 text-slate-600">
-                        Your multi-step loan application has been submitted for processing.
-                        A confirmation summary has been generated in the application state.
+                        Your multi-step loan application has
+                        been submitted for processing. A
+                        confirmation summary has been generated
+                        in the application state.
                     </p>
 
                     <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-                        Demo Application ID: LS-
-                        {Date.now().toString().slice(-8)}
+                        Demo Application ID: {applicationId}
                     </p>
                 </section>
             </main>
@@ -323,13 +349,16 @@ function Wizard() {
 
     return (
         <>
-            {hasCheckedForDraft && hasDraft && !hasResolvedDraftChoice && (
-                <ResumeDraftModal
-                    isLoading={isLoadingDraft}
-                    onResume={handleResumeDraft}
-                    onStartFresh={handleStartFresh}
-                />
-            )}
+            {hasCheckedForDraft
+                && hasDraft
+                && !draftChoiceResolved
+                && (
+                    <ResumeDraftModal
+                        isLoading={isLoadingDraft}
+                        onResume={handleResumeDraft}
+                        onStartFresh={handleStartFresh}
+                    />
+                )}
 
             <main className="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
                 <section className="mx-auto max-w-5xl">
@@ -345,8 +374,10 @@ function Wizard() {
                                 </h1>
 
                                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-                                    Complete your loan application step by step. Your progress is
-                                    encrypted and saved automatically in this browser.
+                                    Complete your loan application
+                                    step by step. Your progress is
+                                    encrypted and saved automatically
+                                    in this browser.
                                 </p>
                             </div>
 

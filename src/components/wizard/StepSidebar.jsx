@@ -5,6 +5,7 @@ function StepSidebar({ steps, currentStepIndex, onStepChange }) {
                 {steps.map((step, index) => {
                     const isActive = index === currentStepIndex;
                     const isCompleted = index < currentStepIndex;
+                    const isFutureStep = index > currentStepIndex;
 
                     let stepButtonClass =
                         'bg-slate-50 text-slate-700 hover:bg-slate-100';
@@ -17,13 +18,24 @@ function StepSidebar({ steps, currentStepIndex, onStepChange }) {
                         stepNumberClass = 'bg-white text-primary';
                     } else if (isCompleted) {
                         stepNumberClass = 'bg-accent text-white';
+                    } else if (isFutureStep) {
+                        stepButtonClass =
+                            'bg-slate-50 text-slate-400 cursor-not-allowed';
+                        stepNumberClass =
+                            'bg-slate-200 text-slate-400';
                     }
 
                     return (
                         <li key={step.id}>
                             <button
                                 type="button"
-                                onClick={() => onStepChange(index)}
+                                onClick={() => {
+                                    if (!isFutureStep) {
+                                        onStepChange(index);
+                                    }
+                                }}
+                                disabled={isFutureStep}
+                                aria-current={isActive ? 'step' : undefined}
                                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition ${stepButtonClass}`}
                             >
                                 <span
@@ -32,7 +44,9 @@ function StepSidebar({ steps, currentStepIndex, onStepChange }) {
                                     {isCompleted ? '✓' : step.id}
                                 </span>
 
-                                <span className="font-medium">{step.title}</span>
+                                <span className="font-medium">
+                                    {step.title}
+                                </span>
                             </button>
                         </li>
                     );

@@ -2,30 +2,18 @@ import { useEffect, useState } from 'react';
 import { PIN_CODE_DATA } from '../data/pinCodeData';
 
 function usePinCodeLookup(pinCode) {
-    const [result, setResult] = useState({
-        isLoading: false,
+    const cleanPinCode = String(pinCode || '').replace(/\D/g, '');
+
+    const [lookupResult, setLookupResult] = useState({
+        pinCode: '',
         record: null,
         error: '',
     });
 
     useEffect(() => {
-        const cleanPinCode = String(pinCode || '').replace(/\D/g, '');
-
-        if (!cleanPinCode || cleanPinCode.length < 6) {
-            setResult({
-                isLoading: false,
-                record: null,
-                error: '',
-            });
-
+        if (cleanPinCode.length !== 6) {
             return undefined;
         }
-
-        setResult({
-            isLoading: true,
-            record: null,
-            error: '',
-        });
 
         const timerId = window.setTimeout(() => {
             const matchedRecord = PIN_CODE_DATA.find(
@@ -33,8 +21,8 @@ function usePinCodeLookup(pinCode) {
             );
 
             if (!matchedRecord) {
-                setResult({
-                    isLoading: false,
+                setLookupResult({
+                    pinCode: cleanPinCode,
                     record: null,
                     error: 'PIN code not found in the demo dataset.',
                 });
@@ -42,8 +30,8 @@ function usePinCodeLookup(pinCode) {
                 return;
             }
 
-            setResult({
-                isLoading: false,
+            setLookupResult({
+                pinCode: cleanPinCode,
                 record: matchedRecord,
                 error: '',
             });
@@ -52,9 +40,29 @@ function usePinCodeLookup(pinCode) {
         return () => {
             window.clearTimeout(timerId);
         };
-    }, [pinCode]);
+    }, [cleanPinCode]);
 
-    return result;
+    if (cleanPinCode.length !== 6) {
+        return {
+            isLoading: false,
+            record: null,
+            error: '',
+        };
+    }
+
+    if (lookupResult.pinCode !== cleanPinCode) {
+        return {
+            isLoading: true,
+            record: null,
+            error: '',
+        };
+    }
+
+    return {
+        isLoading: false,
+        record: lookupResult.record,
+        error: lookupResult.error,
+    };
 }
 
 export default usePinCodeLookup;

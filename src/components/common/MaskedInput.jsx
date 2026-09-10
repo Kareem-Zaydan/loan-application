@@ -1,19 +1,6 @@
 import { forwardRef } from 'react';
 import ErrorMessage from './ErrorMessage';
 
-function maskSensitiveValue(value = '') {
-    const cleanValue = String(value).replace(/\s/g, '');
-
-    if (cleanValue.length <= 4) {
-        return cleanValue;
-    }
-
-    const lastFour = cleanValue.slice(-4);
-    const hiddenPart = '•'.repeat(cleanValue.length - 4);
-
-    return `${hiddenPart}${lastFour}`;
-}
-
 const MaskedInput = forwardRef(function MaskedInput(
     {
         id,
@@ -47,8 +34,12 @@ const MaskedInput = forwardRef(function MaskedInput(
                     className="block text-sm font-semibold text-slate-800"
                 >
                     {label}
+
                     {required && (
-                        <span className="ml-1 text-error" aria-label="required">
+                        <span
+                            className="ml-1 text-error"
+                            aria-label="required"
+                        >
                             *
                         </span>
                     )}
@@ -63,8 +54,11 @@ const MaskedInput = forwardRef(function MaskedInput(
                 aria-invalid={error ? 'true' : 'false'}
                 aria-describedby={errorId}
                 onChange={handleChange}
-                className={`min-h-11 w-full rounded-xl border bg-white px-4 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 ${error ? 'border-error' : 'border-slate-300'
-                    }`}
+                className={`min-h-11 w-full rounded-xl border bg-white px-4 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 ${
+                    error
+                        ? 'border-error'
+                        : 'border-slate-300'
+                }`}
                 {...props}
             />
 
@@ -74,10 +68,12 @@ const MaskedInput = forwardRef(function MaskedInput(
                 </p>
             )}
 
-            <ErrorMessage id={errorId} message={error} />
+            <ErrorMessage
+                id={errorId}
+                message={error}
+            />
         </div>
     );
 });
 
-export { maskSensitiveValue };
 export default MaskedInput;

@@ -1,16 +1,106 @@
-# React + Vite
+# LendSwift — Multi-Step Loan Application Form
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-style multi-step loan application form built with React, Vite, Tailwind CSS, React Hook Form, Zod validation, document upload, e-signature capture, encrypted auto-save, resume draft flow, and Cypress E2E test coverage.
 
-Currently, two official plugins are available:
+This project was built as part of the Zetheta WorkBridge Front End Developer assignment.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Project Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+LendSwift is an 8-step loan application wizard that guides users through the complete loan application process.
 
-## Expanding the ESLint configuration
+The application supports:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Personal Loan
+- Home Loan
+- Business Loan
+
+Each loan type has conditional validation and dynamic fields depending on the selected options.
+
+---
+
+## Main Features
+
+### 1. Multi-Step Wizard
+
+The form contains 8 steps:
+
+1. Loan Type & Loan Details
+2. Personal Information
+3. KYC Verification
+4. Address Information
+5. Employment & Income
+6. Co-applicant Details
+7. Documents & E-signature
+8. Review & Submit
+
+---
+
+### 2. Real-Time Validation
+
+Validation is handled using:
+
+- React Hook Form
+- Zod
+- Custom cross-step validation rules
+
+Examples:
+
+- Loan amount and tenure validation based on loan type
+- PAN format validation
+- Aadhaar validation simulation
+- Address PIN lookup validation
+- Business Loan cannot use Salaried employment type
+- Co-applicant fields become required only when co-applicant is selected
+- Required document upload validation
+- Final review confirmation before submit
+
+---
+
+### 3. Conditional Fields
+
+The form dynamically shows fields based on user choices.
+
+Examples:
+
+- Business Loan shows business-related purposes
+- Home Loan above a threshold requires passport
+- Rented residence shows rent amount
+- Less than 1 year at current address requires previous address
+- Self-employed and business owner applicants show business fields
+- Co-applicant fields appear only when selected
+- Homemaker co-applicant does not require monthly income
+
+---
+
+### 4. KYC Verification Simulation
+
+The KYC step includes simulated verification for:
+
+- PAN
+- Aadhaar
+- Voter ID
+- Passport
+
+The verification flow includes loading states, success states, failed states, and consent validation.
+
+---
+
+### 5. Address PIN Code Lookup
+
+The address step includes a simulated India PIN code lookup system.
+
+When a valid PIN code is entered, the app auto-fills:
+
+- City
+- State
+- Post Office
+
+Example:
+
+```txt
+PIN: 110001
+City: New Delhi
+State: Delhi
+Post Office: Connaught Place

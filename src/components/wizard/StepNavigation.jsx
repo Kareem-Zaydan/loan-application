@@ -8,7 +8,9 @@ function StepNavigation({
     const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === totalSteps - 1;
 
-    const nextButtonLabel = isLastStep ? 'Submit Application' : 'Next';
+    const nextButtonLabel = isLastStep
+        ? 'Submit Application'
+        : 'Next';
 
     const shouldSubmitForm = Boolean(nextFormId);
 
@@ -21,13 +23,6 @@ function StepNavigation({
                 className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 Previous
-            </button>
-
-            <button
-                type="button"
-                className="rounded-xl border border-primary px-5 py-3 font-semibold text-primary transition hover:bg-primary hover:text-white"
-            >
-                Save Draft
             </button>
 
             {shouldSubmitForm ? (
@@ -52,4 +47,4 @@ function StepNavigation({
     );
 }
 
-export default StepNavigation;  
+export default StepNavigation;
